@@ -7,7 +7,7 @@ const commands = [{
     description: 'ask starship bot what the news is'
 }]
 
-const rest = new REST({ version: '9'}).setToken(Secrets.token);
+const rest = new REST({ version: '9'}).setToken(process.env.token || '');
 const client = new Client({intents: []});
 
 client.on('ready', () => {
@@ -27,7 +27,7 @@ client.on('interactionCreate', async interaction => {
       console.log('Started refreshing application (/) commands.');
   
       await rest.put(
-        Routes.applicationGuildCommands(Secrets.clientId, Secrets.starshipId),
+        Routes.applicationGuildCommands(process.env.clientId || '', process.env.starshipId || ''),
         { body: commands },
       );
   
