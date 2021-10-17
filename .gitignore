@@ -3,3 +3,4 @@
 /.vscode
 .env
 *.js*
+!webpack.config.js
