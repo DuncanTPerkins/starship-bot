@@ -56,7 +56,7 @@ jobs:
         with:
           protocol: ftp
           local-dir: ./build/
-          server-dir: /home/container 
+          server-dir: /home/container/ 
           server: us-dal-bots-02.ploxhost.com
           port: 2053
           username: ${{ secrets.PLOX_USERNAME }}
