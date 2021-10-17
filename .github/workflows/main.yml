@@ -39,7 +39,7 @@ jobs:
           SERVER_ID: ${{ secrets.SERVER_ID }}
         run: |
           npm i --production
-          npm build
+          npm run build
 
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
