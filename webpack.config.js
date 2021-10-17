@@ -3,6 +3,7 @@ const path = require( 'path' );
 module.exports = {
     // entry files
     entry: './main.ts',
+   
 
     // bundling mode
     mode: 'production',
@@ -13,8 +14,22 @@ module.exports = {
 
     // output bundles (location)
     output: {
+        filename: '[name].chunkhash.bundle.js',
         path: path.resolve( __dirname, 'build' ),
-        filename: 'main.js',
+        chunkFilename: '[name].chunkhash.bundle.js'
+    },
+    optimization: {
+        runtimeChunk: "single",
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    chunks: 'initial',
+                    name: 'vendors',
+                    test: /[\\/]node_modules[\\/]/,
+                    enforce: true
+                }
+            }
+        }
     },
 
     // file resolutions
