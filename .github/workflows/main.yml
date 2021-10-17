@@ -48,5 +48,5 @@ jobs:
           port: 2053
           username: ${{ secrets.PLOX_USERNAME }}
           password: ${{ secrets.PLOX_PASSWORD }}
-          sourceDir: ./build
-          targetDir: ./
+          sourceDir: build
+          targetDir: /
