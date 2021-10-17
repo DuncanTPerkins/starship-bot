@@ -1,12 +1,15 @@
 const path = require( 'path' );
 
 module.exports = {
+    // entry files
+    entry: './main.ts',
 
     // bundling mode
     mode: 'production',
-
-    // entry files
-    entry: './main.ts',
+    target: "node",
+    node: {
+        __dirname: false
+    },
 
     // output bundles (location)
     output: {
@@ -19,19 +22,15 @@ module.exports = {
         modules : [
             'node_modules'
         ],
-        extensions: [ '.ts', '.js' ],
-    },
-    target: "node",
-    node: {
-        __dirname: false
+        extensions: [ '.ts', '.js', '.json'],
     },
 
     // loaders
     module: {
         rules: [
             {
-                test: /\.tsx?/,
-                use: 'ts-loader'
+                test: /\.tsx?$/,
+                use: 'ts-loader',
             },
             {
                 test: /\.node$/,

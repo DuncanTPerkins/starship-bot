@@ -4,7 +4,7 @@
   "description": "A server bot for discord.",
   "main": "main.js",
   "scripts": {
-    "build": "npx webpack --config webpack.config.js",
+    "build": "npx webpack --env production webpack.config.js",
     "start": "npx ts-node-dev main.ts"
   },
   "repository": {
@@ -27,10 +27,11 @@
     "discord-api-types": "^0.24.0",
     "discord.js": "^13.2.0",
     "lodash": "^4.17.21",
+    "node-loader": "^2.0.0",
+    "ts-loader": "^9.2.6",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0",
-    "node-loader": "^2.0.0",
-    "ts-loader": "^9.2.6"
+    "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
     "@types/node": "^16.11.1",
