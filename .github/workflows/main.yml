@@ -32,6 +32,15 @@ jobs:
         with:
           node-version: 16.x
 
+      # Create .env
+      - name: Create .env File
+        run: |
+          touch build/.env
+          echo token=&{{secrets.BOT_TOKEN}} >> .env
+          echo clientId=&{{secrets.CLIENT_ID}} >> .env
+          echo clientSecret=&{{secrets.CLIENT_SECRET}} >> .env
+          echo starshipId=&{{secrets.STARSHIP_ID}} >> .env
+
       # Build bot
       - name: build
         env:
