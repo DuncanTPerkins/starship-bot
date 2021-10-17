@@ -51,14 +51,13 @@ jobs:
           npm i --production
           npm run build
 
-      - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
-        with:
-          protocol: ftp
-          local-dir: ./build/
-          server-dir: /home/container/ 
-          server: us-dal-bots-02.ploxhost.com
+      - name: Push to SFTP
+        uses: AbleLincoln/push-to-sftp@v1.2
+        with: 
+          host: us-dal-bots-02.ploxhost.com
           port: 2053
           username: ${{ secrets.PLOX_USERNAME }}
           password: ${{ secrets.PLOX_PASSWORD }}
+          sourceDir: build
+          targetDir: /home/container
 
