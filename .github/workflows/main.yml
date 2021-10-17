@@ -37,10 +37,10 @@ jobs:
         run: |
           mkdir build && cd build
           touch .env
-          echo token=&{{ secrets.BOT_TOKEN }} >> .env
-          echo clientId=&{{ secrets.CLIENT_ID }} >> .env
-          echo clientSecret=&{{ secrets.CLIENT_SECRET }} >> .env
-          echo starshipId=&{{ secrets.STARSHIP_ID }} >> .env
+          echo token=${{ secrets.BOT_TOKEN }} >> .env
+          echo clientId=${{ secrets.CLIENT_ID }} >> .env
+          echo clientSecret=${{ secrets.CLIENT_SECRET }} >> .env
+          echo starshipId=${{ secrets.STARSHIP_ID }} >> .env
 
       # Build bot
       - name: build
