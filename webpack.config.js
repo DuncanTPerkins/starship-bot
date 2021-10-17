@@ -16,6 +16,9 @@ module.exports = {
 
     // file resolutions
     resolve: {
+        modules : [
+            'node_modules'
+        ],
         extensions: [ '.ts', '.js' ],
     },
     target: "node",
