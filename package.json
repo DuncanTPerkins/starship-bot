@@ -4,7 +4,7 @@
   "description": "A server bot for discord.",
   "main": "main.js",
   "scripts": {
-    "build": "npx tsc --outDir build",
+    "build": "npm i typescript -D && npx tsc --outDir build",
     "postbuild": "cp package.json build/package.json && cd build && npm i --only=production",
     "start": "npx ts-node-dev main.ts"
   },
