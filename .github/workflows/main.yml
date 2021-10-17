@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,16 +23,25 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Use Node 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
 
       # Build bot
       - name: build
+        env:
+          BOT_TOKEN: $({ secrets.BOT_TOKEN })
+          SERVER_ID: $({ secrets.SERVER_ID })
         run: |
-          npm i
+          npm i --production
           npm build
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      - name: Deploy build artifacts
+        uses: Atyn/simple-sftp-action@0.0.2
+        with: 
+          url: sftp://${( secrets.PLOX_USERNAME )}:${( secrets.PLOX_PASSWORD )}us-dal-bots-02.ploxhost.com:2053
+          directory: build
