@@ -46,7 +46,7 @@ jobs:
         with: 
           host: us-dal-bots-02.ploxhost.com
           port: 2053
-          username: ${( secrets.PLOX_USERNAME )}
-          password: secrets.PLOX_PASSWORD
+          username: ${{ secrets.PLOX_USERNAME }}
+          password: ${{ secrets.PLOX_PASSWORD }}
           sourceDir: ./build
           targetDir: ./
