@@ -48,7 +48,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           SERVER_ID: ${{ secrets.SERVER_ID }}
         run: |
-          npm i --production
+          npm i
           npm run build
 
       - name: Push to SFTP
