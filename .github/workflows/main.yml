@@ -44,7 +44,6 @@ jobs:
 
       # Build bot
       - name: Cached NPM Install
-      - uses: bahmutov/npm-install@v1.6.0
       - run: |
           npm ci --production --prefer-offline --no-audit && 
           npm run build 
