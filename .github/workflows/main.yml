@@ -47,9 +47,10 @@ jobs:
 
       # Build bot
       - name: Cached NPM Install
-      - run: npm ci --production --prefer-offline --no-audit
       - uses: bahmutov/npm-install@v1.6.0
-      - run: npm run build
+      - run: >
+          npm ci --production --prefer-offline --no-audit && 
+          npm run build 
 
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
