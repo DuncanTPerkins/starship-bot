@@ -40,8 +40,12 @@ jobs:
           npm i --production
           npm build
 
-      - name: Deploy build artifacts
-        uses: Atyn/simple-sftp-action@0.0.2
+      - name: Push to SFTP
+        uses: AbleLincoln/push-to-sftp@v1.2
         with: 
-          url: sftp://${( secrets.PLOX_USERNAME )}:${( secrets.PLOX_PASSWORD )}@us-dal-bots-02.ploxhost.com:2053
-          localdir: build
+          host: us-dal-bots-02.ploxhost.com
+          port: 2053
+          username: ${( secrets.PLOX_USERNAME )}
+          password: secrets.PLOX_PASSWORD
+          local-dir: ./build
+          server-dir: ./
