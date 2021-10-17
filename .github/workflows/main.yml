@@ -30,7 +30,7 @@ jobs:
       - name: Use Node 14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          node-version: 16.x
 
       # Build bot
       - name: build
@@ -48,5 +48,5 @@ jobs:
           port: 2053
           username: ${{ secrets.PLOX_USERNAME }}
           password: ${{ secrets.PLOX_PASSWORD }}
-          sourceDir: ./build
-          targetDir: ./
+          sourceDir: build
+          targetDir: /home/container
