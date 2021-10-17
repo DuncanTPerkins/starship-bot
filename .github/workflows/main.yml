@@ -27,7 +27,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
-      - name: Use Node 14.x
+      - name: Use Node 16.x
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
@@ -42,14 +42,14 @@ jobs:
           echo clientSecret=${{ secrets.CLIENT_SECRET }} >> .env
           echo starshipId=${{ secrets.STARSHIP_ID }} >> .env
 
+      - name: NPM or Yarn install with caching
+        uses: bahmutov/npm-install@v1.6.0
+
       # Build bot
-      - name: build
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          SERVER_ID: ${{ secrets.SERVER_ID }}
-        run: |
-          npm i
-          npm run build
+      - name: Cached NPM Install
+      - run: npm ci --production --prefer-offline --no-audit
+      - uses: bahmutov/npm-install@v1.6.0
+      - run: npm run build
 
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
