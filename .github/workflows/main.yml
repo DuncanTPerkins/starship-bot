@@ -35,8 +35,8 @@ jobs:
       # Build bot
       - name: build
         env:
-          BOT_TOKEN: ${( secrets.BOT_TOKEN )}
-          SERVER_ID: ${( secrets.SERVER_ID )}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          SERVER_ID: ${{ secrets.SERVER_ID }}
         run: |
           npm i --production
           npm build
