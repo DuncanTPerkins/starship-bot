@@ -41,11 +41,12 @@ jobs:
           echo clientId=${{ secrets.CLIENT_ID }} >> .env
           echo clientSecret=${{ secrets.CLIENT_SECRET }} >> .env
           echo starshipId=${{ secrets.STARSHIP_ID }} >> .env
+          cd ..
 
       # Build bot
       - name: Cached NPM Install
         run: |
-          npm i --only=prod --prefer-offline --no-audit
+          npm ci --only=prod --prefer-offline --no-audit
           npm run build 
 
       - name: Push to SFTP
