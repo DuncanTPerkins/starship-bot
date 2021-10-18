@@ -14,9 +14,9 @@ module.exports = {
 
     // output bundles (location)
     output: {
-        filename: '[name].chunkhash.bundle.js',
+        filename: '[name].[hash].bundle.js',
         path: path.resolve( __dirname, 'build' ),
-        chunkFilename: '[name].chunkhash.bundle.js'
+        chunkFilename: '[name].[hash].bundle.js'
     },
     optimization: {
         runtimeChunk: "single",
