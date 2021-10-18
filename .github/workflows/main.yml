@@ -47,8 +47,8 @@ jobs:
       - name: Configure AWS Credentials Action For GitHub Actions
         uses: aws-actions/configure-aws-credentials@v1
         with: 
-          aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
-          aws-access-key-id: ${{ AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           with: us-east-1a
 
   deploy: 
@@ -61,8 +61,8 @@ jobs:
       - name: Configure AWS Credentials Action For GitHub Actions
         uses: aws-actions/configure-aws-credentials@v1
         with: 
-          aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
-          aws-access-key-id: ${{ AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           with: us-east-1a
 
       #Deploy Code
