@@ -30,6 +30,7 @@
     "erlpack": "github:discord/erlpack",
     "lodash": "^4.17.21",
     "node-loader": "^2.0.0",
+    "npm": "^8.1.0",
     "ts-loader": "^9.2.6",
     "utf-8-validate": "^5.0.7",
     "webpack": "^5.58.2",
