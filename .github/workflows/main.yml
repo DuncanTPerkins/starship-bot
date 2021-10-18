@@ -73,4 +73,4 @@ jobs:
           --application-name starhip-bot \
           --deployment-group-name GroupAWS \
           --deployment-config-name CodeDeployDefault.OneAtATime \
-          --github-location repository=${{ github.repository }}, commitId=${{ github.sha }}
+          --github-location repository=${{ github.repository }},commitId=${{ github.sha }}
