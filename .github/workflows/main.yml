@@ -49,7 +49,7 @@ jobs:
           npm run build 
 
 
-      - name: "Configure AWS Credentials" Action For GitHub Actions
+        name: Configure AWS Credentials Action For GitHub Actions
         uses: aws-actions/configure-aws-credentials@v1
         with: 
           aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
@@ -63,7 +63,7 @@ jobs:
     steps:
 
       #Configure AWS
-      - name: "Configure AWS Credentials" Action For GitHub Actions
+        name: Configure AWS Credentials Action For GitHub Actions
         uses: aws-actions/configure-aws-credentials@v1
         with: 
           aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
@@ -71,11 +71,11 @@ jobs:
           with: us-east-1a
 
       #Deploy Code
-      name: "Deploy Code"
-      id: deploy
-      run: |
-        aws deploy create-deployment
-        --application-name starhip-bot \
-        --deployment-group-name GroupAWS
-        --deployment-config-name CodeDeployDefault.OneAtATime
-        --github-location repository=${{ github.repository }}, commitId=${{ github.sha }}
+        name: Deploy Code
+        id: deploy
+        run: |
+          aws deploy create-deployment
+          --application-name starhip-bot \
+          --deployment-group-name GroupAWS
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --github-location repository=${{ github.repository }}, commitId=${{ github.sha }}
