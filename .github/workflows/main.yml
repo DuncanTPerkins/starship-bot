@@ -69,8 +69,8 @@ jobs:
       - name: Deploy Code
         id: deploy
         run: |
-          aws deploy create-deployment
+          aws deploy create-deployment \
           --application-name starhip-bot \
-          --deployment-group-name GroupAWS
-          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name GroupAWS \
+          --deployment-config-name CodeDeployDefault.OneAtATime \
           --github-location repository=${{ github.repository }}, commitId=${{ github.sha }}
