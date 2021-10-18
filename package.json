@@ -4,7 +4,7 @@
   "description": "A server bot for discord.",
   "main": "main.js",
   "scripts": {
-    "build": "npx webpack-cli ./webpack.config.js",
+    "build": "npx webpack-cli ./webpack.config.js && cp package.json package-lock.json ./build",
     "start": "ts-node-dev main.ts"
   },
   "repository": {
