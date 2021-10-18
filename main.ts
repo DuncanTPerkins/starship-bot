@@ -18,6 +18,10 @@ client.on('ready', () => {
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 
+  if(interaction.commandName === 'hey') {
+    await interaction.reply('literally fuck your own face');
+  }
+
   if (interaction.commandName === 'sup') {
     await interaction.reply('mostly just chillin tbh');
   }
