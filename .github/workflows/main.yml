@@ -45,7 +45,7 @@ jobs:
       # Build bot
       - name: Cached NPM Install
         run: |
-          npm i --production --prefer-offline --no-audit
+          npm i --only=prod --prefer-offline --no-audit
           npm run build 
 
       - name: Push to SFTP
