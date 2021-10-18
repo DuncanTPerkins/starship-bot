@@ -4,7 +4,7 @@ import { REST } from '@discordjs/rest';
 import { Secrets } from './src/secrets';
 import { Client, Intents } from 'discord.js';
 const commands = [{
-    name: 'sup',
+    name: 'sups',
     description: 'ask starship bot what the news is'
 }]
 
