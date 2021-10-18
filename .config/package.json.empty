@@ -1,0 +1,23 @@
+{
+  "name": "starship-bot",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DuncanTPerkins/starship-bot.git"
+  },
+  "keywords": [
+  ],
+  "author": "Duncan Perkins",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuncanTPerkins/starship-bot/issues"
+  },
+  "homepage": "https://github.com/DuncanTPerkins/starship-bot#readme",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

@@ -1,4 +1,6 @@
-/src/secrets.ts
 /node_modules
 /build
 /.vscode
+*.js
+.env
+!webpack.config.js
