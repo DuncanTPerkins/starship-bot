@@ -56,5 +56,5 @@ jobs:
           username: ${{ secrets.PLOX_USERNAME }}
           password: ${{ secrets.PLOX_PASSWORD }}
           sourceDir: build
-          targetDir: /home/container
+          targetDir: /
 
