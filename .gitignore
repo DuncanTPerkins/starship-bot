@@ -2,5 +2,5 @@
 /build
 /.vscode
 .env
-*.js*
+*.js
 !webpack.config.js
