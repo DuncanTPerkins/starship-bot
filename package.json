@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "build": "npx webpack-cli ./webpack.config.js && cd .config && cp package.json.empty ../build/package.json",
-    "start": "ts-node-dev main.ts"
+    "start": "ts-node-dev main.ts",
+    "tsc": "npx tsc --project tsconfig.json"
   },
   "repository": {
     "type": "git",

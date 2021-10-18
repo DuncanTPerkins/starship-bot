@@ -1,9 +1,12 @@
-const Dotenv = require('dotenv-webpack');
 const path = require('path');
-const { webpack } = require('webpack');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
-  entry: './main.ts',
+  target: 'node',
+  entry: {
+    main: './main.ts'
+  },
+  target: 'node',
   mode: 'production',
   module: {
     rules: [
@@ -18,15 +21,11 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv(
-      {
-        path: './.env'
-      }
-    )
+    new Dotenv()
   ],
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js']
   },
   output: {
     filename: 'main.js',
