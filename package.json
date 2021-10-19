@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx webpack-cli ./webpack.config.js && cd .config && cp package.json.empty ../build/package.json",
     "start": "ts-node-dev main.ts",
-    "tsc": "npx tsc --project tsconfig.json && cd .config && cp package.json.empty ../build/package.json"
+    "tsc": "npx tsc --project tsconfig.json && cp package.json package-lock.json build"
   },
   "repository": {
     "type": "git",

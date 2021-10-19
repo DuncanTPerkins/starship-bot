@@ -39,12 +39,6 @@ jobs:
           touch src/secrets.ts
           echo "${{ secrets.SECRETS_CONST }}" >> src/secrets.ts
 
-      # Build bot
-      - name: Cached NPM Install
-        run: |
-          npm i
-          npm run tsc
-
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
         with: 
