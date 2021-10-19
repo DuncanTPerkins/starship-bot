@@ -35,6 +35,7 @@ jobs:
       # Create .env
       - name: Create secrets File
         run: |
+          mkdir src
           touch src/secrets.ts
           echo ${{ secrets.SECRETS_CONST }} >> src/secrets.ts
 
