@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir src
           touch src/secrets.ts
-          cat ${{ secrets.SECRETS_CONST }} >> src/secrets.ts
+          eacho "${{ secrets.SECRETS_CONST }}" >> src/secrets.ts
 
       # Build bot
       - name: Cached NPM Install
