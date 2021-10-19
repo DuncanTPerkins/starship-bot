@@ -1,15 +1,14 @@
 import { Routes } from 'discord-api-types/v9';
 import { REST } from '@discordjs/rest';
-import { Secrets } from './src/secrets';
 import { Client, Intents } from 'discord.js';
+import { Secrets }  from './src/secrets';
+
 const commands = [{
     name: 'sup',
     description: 'ask starship bot what the news is'
 }]
-
-const rest = new REST({ version: '9'}).setToken(Secrets.token);
-const client = new Client({intents: []});
-
+const rest = new REST({ version: '9'}).setToken(Secrets.env.token || '');
+const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.on('ready', () => {
   console.log(`Logged in as ${client.user?.tag}!`);
 });
@@ -27,7 +26,7 @@ client.on('interactionCreate', async interaction => {
       console.log('Started refreshing application (/) commands.');
   
       await rest.put(
-        Routes.applicationGuildCommands(Secrets.clientId, Secrets.starshipId),
+        Routes.applicationGuildCommands(Secrets.env.clientId || '', Secrets.env.starshipId || ''),
         { body: commands },
       );
   
@@ -37,4 +36,4 @@ client.on('interactionCreate', async interaction => {
     }
   })();
 
-  client.login(Secrets.token);
+  client.login(Secrets.env.token);
