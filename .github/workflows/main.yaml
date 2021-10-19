@@ -38,6 +38,7 @@ jobs:
           mkdir src
           touch src/secrets.ts
           echo "${{ secrets.SECRETS_CONST }}" >> src/secrets.ts
+          npm i
           npm run tsc
 
       - name: Push to SFTP
