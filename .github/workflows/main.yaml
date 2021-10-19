@@ -38,7 +38,6 @@ jobs:
           mkdir src
           touch src/secrets.ts
           echo "${{ secrets.SECRETS_CONST }}" >> src/secrets.ts
-          ls
 
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
