@@ -3,4 +3,5 @@
 /.vscode
 *.js
 .env
+./src/secrets.ts
 !webpack.config.js

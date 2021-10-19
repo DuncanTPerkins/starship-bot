@@ -33,18 +33,16 @@ jobs:
           node-version: 16.x
 
       # Create .env
-      - name: Create .env File
+      - name: Create secrets File
         run: |
-          touch .env
-          echo token=${{ secrets.BOT_TOKEN }} >> .env
-          echo clientId=${{ secrets.CLIENT_ID }} >> .env
-          echo clientSecret=${{ secrets.CLIENT_SECRET }} >> .env
-          echo starshipId=${{ secrets.STARSHIP_ID }} >> .env
+          touch src/secrets.ts
+          echo ${{ secrets.SECRETS_CONST }} >> src/secrets.ts
+
       # Build bot
       - name: Cached NPM Install
         run: |
           npm i
-          npm run build
+          npm run tsc
 
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
