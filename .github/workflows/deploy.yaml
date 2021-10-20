@@ -3,7 +3,7 @@ name: deploy
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [master]
+    branches: [master, proper-workflow]
 
   workflow_dispatch:
 
@@ -12,6 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod build
     steps:
+      - name: Create Deploy Directory
+        run: mkdir build
+
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: starship-bot-build
+          path: build
+
+
       - name: Push to SFTP
         uses: AbleLincoln/push-to-sftp@v1.2
         with:
