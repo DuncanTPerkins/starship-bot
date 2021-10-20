@@ -1,0 +1,23 @@
+name: deploy
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [master]
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod build
+    steps:
+      - name: Push to SFTP
+        uses: AbleLincoln/push-to-sftp@v1.2
+        with:
+          host: us-dal-bots-02.ploxhost.com
+          port: 2053
+          username: ${{ secrets.PLOX_USERNAME }}
+          password: ${{ secrets.PLOX_PASSWORD }}
+          sourceDir: build
+          targetDir: /
