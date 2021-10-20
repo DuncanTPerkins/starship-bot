@@ -5,8 +5,6 @@ name: CI
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
 
@@ -49,7 +47,8 @@ jobs:
         run: |
             npm run tsc
 
-      - name: Push to SFTP
+      - name: deploy if master
+        if: github.ref == 'refs/heads/master'
         uses: AbleLincoln/push-to-sftp@v1.2
         with:
           host: us-dal-bots-02.ploxhost.com
