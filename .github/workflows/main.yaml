@@ -47,8 +47,13 @@ jobs:
         run: |
             npm run tsc
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v2.2.4
-        with: 
-          name: starship-bot-build
-          path: build
+      - name: deploy if master
+        if: github.ref == 'refs/heads/master'
+        uses: AbleLincoln/push-to-sftp@v1.2
+        with:
+          host: us-dal-bots-02.ploxhost.com
+          port: 2053
+          username: ${{ secrets.PLOX_USERNAME }}
+          password: ${{ secrets.PLOX_PASSWORD }}
+          sourceDir: build
+          targetDir: /
