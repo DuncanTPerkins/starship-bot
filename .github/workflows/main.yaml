@@ -50,5 +50,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2.2.4
         with: 
-          name: starship-bot-build-${GITHUB_SHA::6}
+          name: starship-bot-build-${{GITHUB_SHA::6}}
           path: build
