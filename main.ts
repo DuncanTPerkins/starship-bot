@@ -1,3 +1,4 @@
+
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { Client } from 'discord.js';
@@ -24,7 +25,7 @@ client.on('interactionCreate', async interaction => {
     console.log('Started refreshing application (/) commands.');
 
     await rest.put(
-      Routes.applicationGuildCommands(Secrets.env.clientId || '', Secrets.env.starshipId || ''),
+      Routes.applicationGuildCommands(keys.token || '', keys.token || ''),
       { body: commands },
     );
 
@@ -34,4 +35,4 @@ client.on('interactionCreate', async interaction => {
   }
 })();
 
-client.login(Secrets.env.token);
+client.login(keys.token);

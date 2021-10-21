@@ -1,8 +1,9 @@
-import { createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, MessageEmbed } from "discord.js";
 import ytdl from "ytdl-core";
 import ytsr, { Video } from "ytsr";
-import { checkMC, getWrongMcResponse } from "./mc";
+import { SingletonManager } from "../singleton-manager";
+import { SongQueue } from "../song-queue/song-queue";
 import { getAudioPlayer } from "./player";
 
 export async function play(interaction: CommandInteraction) {
@@ -11,6 +12,7 @@ export async function play(interaction: CommandInteraction) {
         return;
     }
     const channel = (interaction.member as GuildMember).voice.channel;
+    const queue = new SongQueue();
     const connection = joinVoiceChannel({
         channelId: channel!.id,
         guildId: channel!.guild.id,
@@ -27,7 +29,9 @@ export async function play(interaction: CommandInteraction) {
 
     await interaction.reply({ embeds: [resultsMessage] });
     const stream = ytdl(song.url, { filter: 'audioonly' });
-    const player = getAudioPlayer(connection);
+    SingletonManager.get(String);
+    SingletonManager.get(Math);
+    const player = SingletonManager.get(AudioPlayer) as AudioPlayer;
     connection.subscribe(player);
     player.play(createAudioResource(stream));
 }
