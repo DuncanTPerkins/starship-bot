@@ -19,8 +19,22 @@ export async function play(interaction: CommandInteraction) {
     const song = await streamer.getStreamableAsset(query || '');
     if (ItemState.PLAYING === queue.addTrack(song.url, song.title)) {
         streamer.joinChannel(channel as VoiceChannel);
+        console.log(song.url);
         let player = streamer.getAudioPlayer(song.url);
         if (player) {
+            queue.trackChanged.subscribe((queueItem) => {
+                console.log(queueItem);
+                if (!queueItem) {
+                    queue.clearQueue();
+                    streamer.disconnect();
+                    return;
+                }
+                player = streamer.getAudioPlayer(queueItem.url);
+                if (!player) {
+                    queue.clearQueue();
+                    streamer.disconnect();
+                }
+            });
             player.on(AudioPlayerStatus.Idle, () => {
                 const nextUp = queue.onTrackEnded();
                 if (!nextUp || !nextUp.url) {

@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export class SongQueue {
     private static instance: SongQueue;
-    public trackChanged: BehaviorSubject<QueueItem | null>;
+    public trackChanged: BehaviorSubject<QueueItem>;
     public currentTrack: QueueItem;
     private queue: QueueItem[] = [];
 
@@ -16,7 +16,7 @@ export class SongQueue {
 
     public constructor() {
         this.currentTrack = this.initQueue.empty();
-        this.trackChanged = new BehaviorSubject<QueueItem | null>(null);
+        this.trackChanged = new BehaviorSubject<QueueItem>(this.initQueue.empty());
     }
 
     public addTrack(url: string, title: string) {
@@ -53,7 +53,7 @@ export class SongQueue {
                 =
                 [this.queue[randomIndex], this.queue[index]];
         }
-        this.trackChanged.next(this.onTrackEnded());
+        this.trackChanged.next(this.onTrackEnded() || this.initQueue.empty());
     }
 
     public clearQueue() {
