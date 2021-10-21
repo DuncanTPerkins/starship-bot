@@ -1,12 +1,13 @@
 import { CommandInteraction } from "discord.js/typings/index.js";
 import { checkMC, getWrongMcResponse } from "./mc";
-import { stopAudioPlayer } from "./player";
+import { AudioStreamer } from "../audio-streamer/audio-streamer";
+import { CommonEmbeds } from "../common/common-embeds";
 
 export async function stop(interaction: CommandInteraction) {
     if (await checkMC(interaction.channelId) === false) {
         await getWrongMcResponse(interaction);
         return;
     }
-    stopAudioPlayer();
+    AudioStreamer.get().stop();
     await interaction.reply('\`🤧 Music stopped\`');
 };
