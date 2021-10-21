@@ -6,7 +6,7 @@ import { checkMC, getWrongMcResponse } from "./mc";
 import { getAudioPlayer } from "./player";
 
 export async function play(interaction: CommandInteraction) {
-    if (await !checkMC(interaction.channelId)) {
+    if (await checkMC(interaction.channelId) === false) {
         await getWrongMcResponse(interaction);
         return;
     }

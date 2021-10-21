@@ -3,7 +3,7 @@ import { checkMC, getWrongMcResponse } from "./mc";
 import { stopAudioPlayer } from "./player";
 
 export async function stop(interaction: CommandInteraction) {
-    if (!checkMC(interaction.channelId)) {
+    if (await checkMC(interaction.channelId) === false) {
         await getWrongMcResponse(interaction);
         return;
     }
