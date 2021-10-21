@@ -25,7 +25,7 @@ client.on('interactionCreate', async interaction => {
     console.log('Started refreshing application (/) commands.');
 
     await rest.put(
-      Routes.applicationGuildCommands(keys.token || '', keys.token || ''),
+      Routes.applicationGuildCommands(Secrets.env.clientId || '', Secrets.env.starshipId || ''),
       { body: commands },
     );
 
@@ -35,4 +35,4 @@ client.on('interactionCreate', async interaction => {
   }
 })();
 
-client.login(keys.token);
+client.login(Secrets.env.token);

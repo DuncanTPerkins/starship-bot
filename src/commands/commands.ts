@@ -1,4 +1,5 @@
 import { CommandInteraction, Constants } from "discord.js";
+import { next } from "./next";
 import { play } from './play';
 import { stop } from "./stop";
 import { sup } from './sup';
@@ -33,6 +34,11 @@ export const commands = [
         name: 'mc',
         description: 'register the current text channel as a music channel',
         fn: mc
+    },
+    {
+        name: 'next',
+        description: 'skips to next song in queue',
+        fn: next
     }
 ]
 

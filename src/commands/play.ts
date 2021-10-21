@@ -1,10 +1,9 @@
 import { AudioPlayer, AudioPlayerStatus, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from "@discordjs/voice";
-import { CommandInteraction, GuildMember, MessageEmbed } from "discord.js";
-import ytdl from "ytdl-core";
+import { CommandInteraction, GuildMember, MessageEmbed, VoiceChannel } from "discord.js";
 import ytsr, { Video } from "ytsr";
-import { SingletonManager } from "../singleton-manager";
+import { AudioStreamer } from "../audio-streamer/audio-streamer";
+import { ItemState } from "../song-queue/models/queue-item";
 import { SongQueue } from "../song-queue/song-queue";
-import { getAudioPlayer } from "./player";
 
 export async function play(interaction: CommandInteraction) {
     if (await checkMC(interaction.channelId) === false) {
@@ -12,26 +11,30 @@ export async function play(interaction: CommandInteraction) {
         return;
     }
     const channel = (interaction.member as GuildMember).voice.channel;
-    const queue = new SongQueue();
-    const connection = joinVoiceChannel({
-        channelId: channel!.id,
-        guildId: channel!.guild.id,
-        adapterCreator: channel!.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
-    });
+    const queue = SongQueue.get();
+    const streamer = AudioStreamer.get();
 
-    const searchQuery = interaction.options.getString('query');
-    const results = await ytsr(searchQuery!, { limit: 1 }); // just grab first result for now
-    const song: Video = results.items[0] as Video
+    const query = interaction.options.getString('query');
+    const song = await streamer.getStreamableAsset(query || '');
+    if (ItemState.PLAYING === queue.addTrack(song.url, song.title)) {
+        streamer.joinChannel(channel as VoiceChannel);
+        let player = streamer.getAudioPlayer(song.url);
+        if (player) {
+            player.on(AudioPlayerStatus.Idle, () => {
+                const nextUp = queue.onTrackEnded();
+                if (!nextUp) {
+                    streamer.disconnect();
+                    return;
+                }
+                player = streamer.getAudioPlayer(nextUp.url);
+            });
+        }
+    }
+
     const resultsMessage = new MessageEmbed()
-        .setTitle(`📀 Search For: \`${searchQuery}\``)
+        .setTitle(`📀 Queueing: \`${song.title}\``)
         .setColor("#f73772")
         .addField(song.title, song.url);
 
     await interaction.reply({ embeds: [resultsMessage] });
-    const stream = ytdl(song.url, { filter: 'audioonly' });
-    SingletonManager.get(String);
-    SingletonManager.get(Math);
-    const player = SingletonManager.get(AudioPlayer) as AudioPlayer;
-    connection.subscribe(player);
-    player.play(createAudioResource(stream));
 }
