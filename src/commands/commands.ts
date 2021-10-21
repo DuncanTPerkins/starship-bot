@@ -2,6 +2,7 @@ import { CommandInteraction, Constants } from "discord.js";
 import { play } from './play';
 import { stop } from "./stop";
 import { sup } from './sup';
+import { mc } from './mc';
 
 export const commands = [
     {
@@ -28,6 +29,11 @@ export const commands = [
         fn: sup
 
     },
+    {
+        name: 'mc',
+        description: 'register the current text channel as a music channel',
+        fn: mc
+    }
 ]
 
 export async function execCommand(interaction: CommandInteraction) {
