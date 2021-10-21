@@ -5,6 +5,7 @@ import { AudioStreamer } from "../audio-streamer/audio-streamer";
 import { CommonEmbeds } from "../common/common-embeds";
 import { ItemState } from "../song-queue/models/queue-item";
 import { SongQueue } from "../song-queue/song-queue";
+import { checkMC, getWrongMcResponse } from "./mc";
 
 export async function play(interaction: CommandInteraction) {
     if (await checkMC(interaction.channelId) === false) {
@@ -19,14 +20,10 @@ export async function play(interaction: CommandInteraction) {
     const song = await streamer.getStreamableAsset(query || '');
     if (ItemState.PLAYING === queue.addTrack(song.url, song.title)) {
         streamer.joinChannel(channel as VoiceChannel);
-        console.log(song.url);
         let player = streamer.getAudioPlayer(song.url);
         if (player) {
             queue.trackChanged.subscribe((queueItem) => {
-                console.log(queueItem);
-                if (!queueItem) {
-                    queue.clearQueue();
-                    streamer.disconnect();
+                if (!queueItem || !queueItem.url) {
                     return;
                 }
                 player = streamer.getAudioPlayer(queueItem.url);
