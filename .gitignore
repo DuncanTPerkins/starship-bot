@@ -4,5 +4,6 @@
 !/.vscode/settings.json
 *.js
 .env
+database.db
 /src/secrets.ts
 !webpack.config.js
