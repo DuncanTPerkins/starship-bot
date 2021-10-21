@@ -93,16 +93,11 @@ export class SongQueue {
     }
 
     private changeTracks(current: QueueItem, replacement: QueueItem) {
-        console.log('----------')
-        console.log(current, replacement);
         let a = [ItemState.PLAYING, ItemState.DEFAULT].includes(current.state)  ? current : replacement;
         let b = [current, replacement].find(x => x !== a) || {} as QueueItem;
         a.state = ItemState.PLAYED;
         b.state = ItemState.PLAYING;
         this.currentTrack = b;
-        console.log(this.currentTrack);
         this.trackChanged.next(this.currentTrack);
-        console.log('----------')
-
     }
 }

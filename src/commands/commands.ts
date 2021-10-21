@@ -1,6 +1,7 @@
 import { CommandInteraction, Constants } from "discord.js";
 import { next } from "./next";
 import { play } from './play';
+import { queue } from "./queue";
 import { stop } from "./stop";
 import { sup } from './sup';
 import { mc } from './mc';
@@ -39,6 +40,11 @@ export const commands = [
         name: 'next',
         description: 'skips to next song in queue',
         fn: next
+    },
+    {
+        name: 'queue',
+        description: 'display the contents of the queue',
+        fn: queue
     }
 ]
 
