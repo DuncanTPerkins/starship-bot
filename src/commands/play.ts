@@ -2,6 +2,7 @@ import { AudioPlayer, AudioPlayerStatus, createAudioResource, DiscordGatewayAdap
 import { CommandInteraction, GuildMember, MessageEmbed, VoiceChannel } from "discord.js";
 import ytsr, { Video } from "ytsr";
 import { AudioStreamer } from "../audio-streamer/audio-streamer";
+import { CommonEmbeds } from "../common/common-embeds";
 import { ItemState } from "../song-queue/models/queue-item";
 import { SongQueue } from "../song-queue/song-queue";
 
@@ -22,19 +23,19 @@ export async function play(interaction: CommandInteraction) {
         if (player) {
             player.on(AudioPlayerStatus.Idle, () => {
                 const nextUp = queue.onTrackEnded();
-                if (!nextUp) {
+                if (!nextUp || !nextUp.url) {
                     streamer.disconnect();
                     return;
                 }
                 player = streamer.getAudioPlayer(nextUp.url);
+                if (!player) {
+                    queue.clearQueue();
+                    streamer.disconnect();
+                }
             });
         }
     }
 
-    const resultsMessage = new MessageEmbed()
-        .setTitle(`📀 Queueing: \`${song.title}\``)
-        .setColor("#f73772")
-        .addField(song.title, song.url);
-
+    const resultsMessage = CommonEmbeds.queueing(song.url, song.title);
     await interaction.reply({ embeds: [resultsMessage] });
 }

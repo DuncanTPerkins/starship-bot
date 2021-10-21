@@ -2,6 +2,7 @@ import { AudioPlayer, AudioPlayerStatus, createAudioResource, DiscordGatewayAdap
 import { VoiceChannel } from "discord.js";
 import ytdl from "ytdl-core";
 import ytsr, { Video } from "ytsr";
+import { SongQueue } from "../song-queue/song-queue";
 
 export class AudioStreamer {
     private audioPlayer: AudioPlayer;
@@ -28,6 +29,10 @@ export class AudioStreamer {
 
     public getAudioPlayer(url: string) {
         const stream = ytdl(url, { filter: 'audioonly' });
+        if (!url || !stream) {
+            this.disconnect();
+            return null;
+        }
         if (this.connection) {
             this.connection.subscribe(this.audioPlayer);
             this.audioPlayer.play(createAudioResource(stream));

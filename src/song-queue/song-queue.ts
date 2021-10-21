@@ -53,7 +53,11 @@ export class SongQueue {
                 =
                 [this.queue[randomIndex], this.queue[index]];
         }
-        this.onTrackEnded();
+        this.trackChanged.next(this.onTrackEnded());
+    }
+
+    public clearQueue() {
+        this.queue = [this.initQueue.empty()];
     }
 
     public toString = () => {
