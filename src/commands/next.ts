@@ -8,7 +8,6 @@ export async function next(interaction: CommandInteraction) {
     const streamer = AudioStreamer.get();
     const current = queue.currentTrack;
     SongQueue.get().trackChanged.pipe().subscribe((queueItem) => {
-        console.log('event reached', queueItem);
         if (!queueItem || queueItem === current) {
             return;
         }
@@ -17,9 +16,9 @@ export async function next(interaction: CommandInteraction) {
     queue.onTrackEnded();
 
     const resultsMessage = new MessageEmbed()
-    .setTitle(`📀 Now Playing: \`${ queue.currentTrack.title}\``)
+    .setTitle(`📀 Now Playing: \`${ queue?.currentTrack?.title}\``)
     .setColor("#f73772")
-    .addField(queue.currentTrack.title, queue.currentTrack.url);
+    .addField(queue?.currentTrack?.title || '', queue?.currentTrack?.url || '');
 
 await interaction.reply({ embeds: [resultsMessage] });
 }

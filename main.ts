@@ -17,7 +17,7 @@ client.on('ready', () => {
 client.on('interactionCreate', async interaction => {
   if (!interaction.isCommand()) return;
 
-  else execCommand(interaction);
+  else await execCommand(interaction);
 });
 
 (async () => {
