@@ -17,12 +17,5 @@ export async function YoutubePlaylistToQueueItems(playlistUrl: string) {
 
 export function IsYoutubePlaylist(playlistUrl: string) {
     const playlistIndicators = ['/playlist', 'list='];
-    let is = false;
-    for (let indicator of playlistIndicators) {
-        if (playlistUrl.includes(indicator)) {
-            is = true;
-            break;
-        }
-    }
-    return is;
+    return playlistIndicators.some(indicator => playlistUrl.includes(indicator))
 }
