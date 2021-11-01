@@ -34,9 +34,7 @@ jobs:
 
       # Create .env
       - name: Create secrets File
-        run: |
-          touch src/secrets.ts
-          echo "${{ secrets.SECRETS_CONST }}" >> src/secrets.ts
+        run: 'echo "${{ secrets.SECRETS_CONST }}" > src/secrets.ts'
 
       #install modules
       - name: Install node modules
@@ -53,9 +51,9 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: AbleLincoln/push-to-sftp@v1.2
         with:
-          host: us-dal-bots-02.ploxhost.com
-          port: 2053
-          username: ${{ secrets.PLOX_USERNAME }}
-          password: ${{ secrets.PLOX_PASSWORD }}
+          host: 45.76.19.11
+          port: 22
+          username: ${{ secrets.VULTR_USER }}
+          password: ${{ secrets.VULTR_PASS }}
           sourceDir: build
-          targetDir: /
+          targetDir: /root/build

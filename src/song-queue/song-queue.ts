@@ -1,11 +1,11 @@
 import { QueueItem, ItemState } from "./models/queue-item";
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 export class SongQueue {
     private static instance: SongQueue;
-    public trackChanged: BehaviorSubject<QueueItem>;
-    public currentTrack: QueueItem;
-    private queue: QueueItem[] = [];
+    public trackChanged: BehaviorSubject<QueueItem | null>;
+    public currentTrack: QueueItem | undefined;
+    public queue: QueueItem[] = [];
 
     public static get() {
         if (!SongQueue.instance) {
@@ -15,16 +15,27 @@ export class SongQueue {
     }
 
     public constructor() {
-        this.currentTrack = this.initQueue.empty();
-        this.trackChanged = new BehaviorSubject<QueueItem>(this.initQueue.empty());
+        this.queue = [];
+        this.trackChanged = new BehaviorSubject<QueueItem | null>(null);
     }
 
-    public addTrack(url: string, title: string) {
-        const queueItem: QueueItem = this.queue.length === 0 
-            ? this.initQueue.playing(url, title) 
-            : this.initQueue.inQueue(url, title);
-        this.queue.push(queueItem);
-        return queueItem.state;
+    public async addTrack(url: string, title: string) {
+        const queueItem: QueueItem = this.queue.length === 0
+            ? this.initQueue.playing(url, title)
+            : this.initQueue.inQueue(url, title)
+        if (!this.currentTrack) {
+            this.queue = [queueItem]
+            this.currentTrack = queueItem;
+            this.trackChanged.next(queueItem);
+        } else {
+            this.queue.push(queueItem);
+        }
+        return queueItem;
+    }
+
+    public isThereUpNext = () => {
+        const isThere = this.queue.filter(q => q.state === ItemState.IN_QUEUE).length > 0
+        return isThere;
     }
 
     public onTrackEnded = () => {
@@ -57,14 +68,24 @@ export class SongQueue {
     }
 
     public clearQueue() {
-        this.queue = [this.initQueue.empty()];
+        this.queue = [];
     }
 
     public toString = () => {
-        let str = 'Queue: \n';
-        for (let i = 0; i < this.queue.length; i++) {
-            str += `${i + 1}: ${this.queue[i].title}\n`;
+        const currentIndex = this.queue.findIndex(x => x === this.currentTrack);
+        const roomAtTheStart = currentIndex - 10 > - 1;
+        const lastItem = this.queue[this.queue.length - 1];
+        const roomAtTheEnd = currentIndex + 10 < this.queue.length - 1;
+        const startIndex = roomAtTheStart ? currentIndex - 10 : 0;
+        const endIndex = roomAtTheEnd ? currentIndex + 10 : this.queue.length;
+        let str = '```diff\n';
+        str += roomAtTheStart ? '.  .  .\n' : '';
+        for (let i = startIndex; i < endIndex; i++) {
+            let character = i < currentIndex ? '- ' : currentIndex < i ? '   ' : '+  '
+            str += `${character} ${i + 1}: ${this.queue[i].title}\n`;
         }
+        str += roomAtTheEnd ? `    .  .  .\n    ${this.queue.length - 1}: ${lastItem.title}`  : '';
+        str += '```';
         return str;
     }
 
@@ -96,8 +117,14 @@ export class SongQueue {
         }
     }
 
-    private changeTracks(current: QueueItem, replacement: QueueItem) {
-        let a = [ItemState.PLAYING, ItemState.DEFAULT].includes(current.state)  ? current : replacement;
+    private changeTracks(current: QueueItem | undefined, replacement: QueueItem | undefined) {
+        if (!replacement) {
+            replacement = this.initQueue.empty();
+        } 
+        if (!current) {
+            current = this.initQueue.empty();
+        }
+        let a = [ItemState.PLAYING, ItemState.DEFAULT].includes(current.state) ? current : replacement;
         let b = [current, replacement].find(x => x !== a) || {} as QueueItem;
         a.state = ItemState.PLAYED;
         b.state = ItemState.PLAYING;

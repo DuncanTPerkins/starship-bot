@@ -10,6 +10,5 @@ export class SingletonManager {
         this.instances.push(newObject);
         return newObject;
         this.instances.forEach(x => console.log(typeof(x)));
-        console.log('----');
     }
 }

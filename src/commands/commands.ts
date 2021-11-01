@@ -59,6 +59,6 @@ export async function execCommand(interaction: CommandInteraction) {
     if (!command) {
         await interaction.reply(`Command: ${interaction.commandName} not found.`);
     } else {
-        command.fn(interaction);
+        await command.fn(interaction);
     }
 }
