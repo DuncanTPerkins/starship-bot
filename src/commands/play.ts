@@ -1,13 +1,11 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from "@discordjs/voice";
-import { CommandInteraction, GuildMember, MessageEmbed, VoiceChannel } from "discord.js";
-import ytsr, { Video } from "ytsr";
-import ytpl from "ytpl";
+import { AudioPlayerStatus } from "@discordjs/voice";
+import { CommandInteraction, GuildMember, VoiceChannel } from "discord.js";
 import { AudioStreamer } from "../audio-streamer/audio-streamer";
 import { CommonEmbeds } from "../common/common-embeds";
+import { IsYoutubePlaylist, YoutubePlaylistToQueueItems } from "../playlist-handlers/youtube-playlist-handler";
 import { ItemState, QueueItem } from '../song-queue/models/queue-item';
 import { SongQueue } from '../song-queue/song-queue';
 import { checkMC, getWrongMcResponse } from "./mc";
-import { IsYoutubePlaylist, YoutubePlaylistToQueueItems } from "../playlist-handlers/youtube-playlist-handler";
 
 export async function play(interaction: CommandInteraction) {
     if (await checkMC(interaction.channelId) === false) {
@@ -20,24 +18,21 @@ export async function play(interaction: CommandInteraction) {
     const streamer = AudioStreamer.get();
     const query = interaction.options.getString('query');
     const isPlaylist = IsYoutubePlaylist(query || '');
-    let song: Video;
     if (isPlaylist) {
         const result = await YoutubePlaylistToQueueItems(query || '');
         if (!result) {
-            await interaction.editReply({ embeds: [CommonEmbeds.error('adding your playlist.')]})
+            await interaction.editReply({ embeds: [CommonEmbeds.error('adding your playlist.')] })
             streamer.disconnect();
             return;
         }
         await trackQueued(interaction, undefined, result)
     } else {
         const song = await streamer.getStreamableAsset(query || '');
-        console.log(song);
         if (!song) {
-            await interaction.editReply({ embeds: [CommonEmbeds.error('finding a result for your search.')]})
+            await interaction.editReply({ embeds: [CommonEmbeds.error('finding a result for your search.')] })
             return;
         }
-        const item = await queue.addTrack(song.url, song.title);
-        console.log('item', item);
+        const item = await queue.addTrack(song.url, song.title, song.bestThumbnail.url || '');
         await trackQueued(interaction, item);
     }
     if (!streamer.isPlaying()) {
@@ -45,7 +40,6 @@ export async function play(interaction: CommandInteraction) {
         let player = streamer.getAudioPlayer(queue?.currentTrack?.url || '');
         if (player) {
             const trackChanged = queue.trackChanged.subscribe((queueItem) => {
-                console.log('track changed', queueItem)
                 if (!queueItem || !queueItem.url || isPlaylist) {
                     return;
                 }
@@ -73,9 +67,10 @@ export async function play(interaction: CommandInteraction) {
 
 export async function trackQueued(interaction: CommandInteraction, item: QueueItem | undefined = undefined, playlist?: any) {
     const queue = SongQueue.get();
-    item = playlist 
-        ? { title: playlist[1], url: playlist[0], state: ItemState.DEFAULT }
+    item = playlist
+        ? { title: playlist[1], url: playlist[0], thumbnail: playlist[3], state: ItemState.DEFAULT }
         : item ? item : queue.currentTrack || undefined
-    const resultsMessage = CommonEmbeds.queueing(item?.title || '', item?.url || '');
+
+    const resultsMessage = CommonEmbeds.queueing(item?.title || '', item?.url || '', item?.thumbnail || '');
     await interaction.editReply({ embeds: [resultsMessage] });
 }

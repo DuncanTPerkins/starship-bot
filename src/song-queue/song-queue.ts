@@ -1,5 +1,5 @@
-import { QueueItem, ItemState } from "./models/queue-item";
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+import { ItemState, QueueItem } from "./models/queue-item";
 
 export class SongQueue {
     private static instance: SongQueue;
@@ -7,7 +7,7 @@ export class SongQueue {
     public currentTrack: QueueItem | undefined;
     public queue: QueueItem[] = [];
 
-    public static get() {
+    public static get(): SongQueue {
         if (!SongQueue.instance) {
             SongQueue.instance = new SongQueue();
         }
@@ -19,10 +19,10 @@ export class SongQueue {
         this.trackChanged = new BehaviorSubject<QueueItem | null>(null);
     }
 
-    public async addTrack(url: string, title: string) {
+    public async addTrack(url: string, title: string, thumbnail?: string): Promise<QueueItem> {
         const queueItem: QueueItem = this.queue.length === 0
-            ? this.initQueue.playing(url, title)
-            : this.initQueue.inQueue(url, title)
+            ? this.initQueue.playing(url, title, thumbnail)
+            : this.initQueue.inQueue(url, title, thumbnail)
         if (!this.currentTrack) {
             this.queue = [queueItem]
             this.currentTrack = queueItem;
@@ -33,27 +33,30 @@ export class SongQueue {
         return queueItem;
     }
 
-    public isThereUpNext = () => {
-        const isThere = this.queue.filter(q => q.state === ItemState.IN_QUEUE).length > 0
-        return isThere;
+    public isThereUpNext(): boolean {
+        return this.queue.filter(q => q.state === ItemState.IN_QUEUE).length > 0
     }
 
-    public onTrackEnded = () => {
+    public isEmpty(): boolean {
+        return !this.queue || this.queue.length === 0;
+    }
+
+    public onTrackEnded(): QueueItem | undefined | null {
         const tracks = this.queue.filter(qi => qi.state === ItemState.IN_QUEUE);
-        if (!tracks) {
+        if (!tracks || tracks.length === 0) {
             return null;
         }
         this.changeTracks(this.currentTrack, tracks[0]);
         return this.currentTrack;
     }
 
-    public onReverse = () => {
+    public onReverse(): QueueItem | undefined {
         const finishedTracks = this.queue.filter(qi => qi.state === ItemState.PLAYED);
         this.changeTracks(finishedTracks[finishedTracks.length - 1], this.currentTrack);
         return this.currentTrack;
     }
 
-    public shuffle = () => {
+    public shuffle() {
         //Fisher-Yates shuffle
         let index = this.queue.length
         let randomIndex = 0;
@@ -69,9 +72,10 @@ export class SongQueue {
 
     public clearQueue() {
         this.queue = [];
+        this.currentTrack = undefined;
     }
 
-    public toString = () => {
+    public toString(): string {
         const currentIndex = this.queue.findIndex(x => x === this.currentTrack);
         const roomAtTheStart = currentIndex - 10 > - 1;
         const lastItem = this.queue[this.queue.length - 1];
@@ -84,12 +88,12 @@ export class SongQueue {
             let character = i < currentIndex ? '- ' : currentIndex < i ? '   ' : '+  '
             str += `${character} ${i + 1}: ${this.queue[i].title}\n`;
         }
-        str += roomAtTheEnd ? `    .  .  .\n    ${this.queue.length - 1}: ${lastItem.title}`  : '';
+        str += roomAtTheEnd ? `    .  .  .\n    ${this.queue.length - 1}: ${lastItem.title}` : '';
         str += '```';
         return str;
     }
 
-    private finishedTracks = () => {
+    private finishedTracks(): QueueItem[] {
         return this.queue.filter(qi => qi.state === ItemState.PLAYED);
     }
 
@@ -98,20 +102,23 @@ export class SongQueue {
             return {
                 url: '',
                 title: '',
+                thumbnail: '',
                 state: ItemState.DEFAULT
             } as QueueItem
         },
-        inQueue: (url: string, title: string) => {
+        inQueue: (url: string, title: string, thumbnail?: string) => {
             return {
                 url,
                 title,
+                thumbnail,
                 state: ItemState.IN_QUEUE
             } as QueueItem
         },
-        playing: (url: string, title: string) => {
+        playing: (url: string, title: string, thumbnail?: string) => {
             return {
                 url,
                 title,
+                thumbnail,
                 state: ItemState.PLAYING
             } as QueueItem
         }
@@ -120,7 +127,7 @@ export class SongQueue {
     private changeTracks(current: QueueItem | undefined, replacement: QueueItem | undefined) {
         if (!replacement) {
             replacement = this.initQueue.empty();
-        } 
+        }
         if (!current) {
             current = this.initQueue.empty();
         }

@@ -1,4 +1,4 @@
-import { CommandInteraction, TextChannel } from "discord.js/typings/index.js";
+import { CommandInteraction, MessageEmbed, TextChannel } from "discord.js";
 import { getDb } from "../db/db";
 
 export async function mc(interaction: CommandInteraction) {
@@ -7,9 +7,17 @@ export async function mc(interaction: CommandInteraction) {
         await interaction.reply(`\`❌ ${result.message}\``);
     } else {
         const { name } = interaction.guild?.channels.cache.get(interaction.channelId) as TextChannel;
-        await interaction.reply(`\`✔️ Registered current channel (name: ${name}, id: ${interaction.channelId}) as a music channel.\``);
+        await interaction.reply({
+            embeds: [
+                new MessageEmbed()
+                    .setTitle('Success')
+                    .setDescription(`✔️ Registered current channel (name: ${name}, id: ${interaction.channelId}) as a music channel.`)
+                    .setColor('#f73772')
+            ], ephemeral: true
+        });
     }
-};
+}
+
 
 export async function registerMC(channelId: string): Promise<any> {
     const db = await getDb();
@@ -53,5 +61,13 @@ export async function getMC(): Promise<any> {
 export async function getWrongMcResponse(interaction: CommandInteraction) {
     const { channel_id } = await getMC();
     const { name } = interaction.guild?.channels.cache.get(channel_id.toString()) as TextChannel;
-    await interaction.reply({ content: `\`👮 Music commands can only be used in the registered music channel: ${name}\``, ephemeral: true });
+    await interaction.reply({
+        embeds: [
+            new MessageEmbed()
+                .setTitle('No...')
+                .setDescription(`Music commands can only be used in the registered music channel: ${name}`)
+                .setColor('#f73772')
+        ],
+        ephemeral: true
+    });
 }

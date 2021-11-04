@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageEmbed } from "discord.js";
-import { pipe, take } from "rxjs";
 import { AudioStreamer } from "../audio-streamer/audio-streamer";
+import { CommonEmbeds } from "../common/common-embeds";
 import { SongQueue } from "../song-queue/song-queue";
 
 export async function next(interaction: CommandInteraction) {
@@ -11,14 +11,25 @@ export async function next(interaction: CommandInteraction) {
         if (!queueItem || queueItem === current) {
             return;
         }
-        streamer.getAudioPlayer(queueItem.url);
+        streamer.getAudioPlayer(queueItem?.url);
     });
-    queue.onTrackEnded();
 
-    const resultsMessage = new MessageEmbed()
-    .setTitle(`📀 Now Playing: \`${ queue?.currentTrack?.title}\``)
-    .setColor("#f73772")
-    .addField(queue?.currentTrack?.title || '', queue?.currentTrack?.url || '');
+    const next = queue.onTrackEnded();
 
-await interaction.reply({ embeds: [resultsMessage] });
+    if (next) {
+        interaction.reply({
+            embeds: [
+                CommonEmbeds.musicEmbed('Now Playing:', next?.title || '', next?.url || '', next?.thumbnail || '')
+            ]
+        })
+    } else {
+        streamer.stop();
+        interaction.reply({
+            embeds: [new MessageEmbed()
+                .setTitle('End of Queue')
+                .setDescription(`No songs remaining`)
+                .setColor(0x00AE86)
+            ]
+        });
+    }
 }
