@@ -1,8 +1,7 @@
-import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice"
+import { AudioPlayer, AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import { VoiceChannel } from "discord.js";
 import ytdl from "ytdl-core";
 import ytsr, { getFilters, Video } from "ytsr";
-import { SongQueue } from "../song-queue/song-queue";
 
 export class AudioStreamer {
     private audioPlayer: AudioPlayer;
@@ -13,7 +12,7 @@ export class AudioStreamer {
         this.audioPlayer = createAudioPlayer();
     }
 
-    public static get() {
+    public static get(): AudioStreamer {
         if (!AudioStreamer.instance) {
             AudioStreamer.instance = new AudioStreamer();
         }
@@ -28,8 +27,8 @@ export class AudioStreamer {
         });
     }
 
-    public getAudioPlayer(url: string | undefined) {
-        if(!url) {
+    public getAudioPlayer(url: string | undefined): AudioPlayer | null {
+        if (!url) {
             return null;
         }
         const stream = ytdl(url, { filter: 'audioonly', highWaterMark: 32000 });
@@ -45,12 +44,11 @@ export class AudioStreamer {
         return this.audioPlayer;
     }
 
-    public isPlaying = () => {
-        let is = this.audioPlayer.state.status === AudioPlayerStatus.Playing;
-        return is; 
+    public isPlaying(): boolean {
+        return this.audioPlayer.state.status === AudioPlayerStatus.Playing;
     }
 
-    public async getStreamableAsset(query: string) {
+    public async getStreamableAsset(query: string): Promise<Video | null> {
         let filter;
         const ytsrQuery = await getFilters(query)
         const filters = ytsrQuery.get('Type')?.get('Video');
@@ -64,15 +62,15 @@ export class AudioStreamer {
     }
 
     public stop() {
-        this.audioPlayer.stop();
+        this.disconnect();
     }
 
     public disconnect() {
-        if (!this.connection) {
+        if (this.connection?.state.status === VoiceConnectionStatus.Destroyed) {
             return null;
         }
         this.hasSubscription = false;
-        this.audioPlayer.stop();
-        this.connection.destroy();
+        this.isPlaying() && this.audioPlayer.stop();
+        this.connection?.destroy();
     }
 }
