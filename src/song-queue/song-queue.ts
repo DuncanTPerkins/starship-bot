@@ -4,7 +4,7 @@ import { ItemState, QueueItem } from "./models/queue-item";
 export class SongQueue {
     private static instance: SongQueue;
     public trackChanged: BehaviorSubject<QueueItem | null>;
-    public currentTrack: QueueItem | undefined;
+    public currentTrack: QueueItem | null = null;
     public queue: QueueItem[] = [];
 
     public static get(): SongQueue {
@@ -19,40 +19,55 @@ export class SongQueue {
         this.trackChanged = new BehaviorSubject<QueueItem | null>(null);
     }
 
-    public async addTrack(url: string, title: string, thumbnail?: string): Promise<QueueItem> {
-        const queueItem: QueueItem = this.queue.length === 0
-            ? this.initQueue.playing(url, title, thumbnail)
-            : this.initQueue.inQueue(url, title, thumbnail)
+    public addTrack(url: string, title: string, thumbnail?: string): QueueItem {
+        const queueItem: QueueItem = this.initQueueItem(url, title, thumbnail);
         if (!this.currentTrack) {
             this.queue = [queueItem]
-            this.currentTrack = queueItem;
-            this.trackChanged.next(queueItem);
+            this.changeTracks(queueItem);
         } else {
             this.queue.push(queueItem);
         }
         return queueItem;
     }
 
-    public isThereUpNext(): boolean {
-        return this.queue.filter(q => q.state === ItemState.IN_QUEUE).length > 0
+    public getSongsInQueue(): QueueItem[] {
+        return this.queue.filter(q => q.state === ItemState.IN_QUEUE);
+    }
+
+    private getFinishedTracks(): QueueItem[] {
+        return this.queue.filter(qi => qi.state === ItemState.PLAYED);
     }
 
     public isEmpty(): boolean {
         return !this.queue || this.queue.length === 0;
     }
 
-    public onTrackEnded(): QueueItem | undefined | null {
-        const tracks = this.queue.filter(qi => qi.state === ItemState.IN_QUEUE);
+    private changeTracks(track: QueueItem) {
+        if (this.currentTrack) {
+            this.currentTrack.state = ItemState.PLAYED;
+        }
+        this.currentTrack = track;
+        track.state = ItemState.PLAYING;
+        this.trackChanged.next(this.currentTrack);
+    }
+
+    public onTrackEnded(): QueueItem | null {
+        const tracks = this.getSongsInQueue();
         if (!tracks || tracks.length === 0) {
+            this.clearQueue();
             return null;
         }
-        this.changeTracks(this.currentTrack, tracks[0]);
+        this.changeTracks(tracks[0]);
         return this.currentTrack;
     }
 
-    public onReverse(): QueueItem | undefined {
-        const finishedTracks = this.queue.filter(qi => qi.state === ItemState.PLAYED);
-        this.changeTracks(finishedTracks[finishedTracks.length - 1], this.currentTrack);
+    public onReverse(): QueueItem | null {
+        const finishedTracks = this.getFinishedTracks();
+        if (!finishedTracks || finishedTracks.length === 0) {
+            console.error('Error trying to reverse');
+            return null;
+        }
+        this.changeTracks(finishedTracks[finishedTracks.length - 1]);
         return this.currentTrack;
     }
 
@@ -63,16 +78,14 @@ export class SongQueue {
         while (index) {
             randomIndex = Math.floor(Math.random() * index);
             index--;
-            [this.queue[index], this.queue[randomIndex]]
-                =
-                [this.queue[randomIndex], this.queue[index]];
+            [this.queue[index], this.queue[randomIndex]] = [this.queue[randomIndex], this.queue[index]];
         }
-        this.trackChanged.next(this.onTrackEnded() || this.initQueue.empty());
+        this.onTrackEnded();
     }
 
     public clearQueue() {
         this.queue = [];
-        this.currentTrack = undefined;
+        this.currentTrack = null;
     }
 
     public toString(): string {
@@ -93,49 +106,7 @@ export class SongQueue {
         return str;
     }
 
-    private finishedTracks(): QueueItem[] {
-        return this.queue.filter(qi => qi.state === ItemState.PLAYED);
-    }
-
-    private initQueue = {
-        empty: () => {
-            return {
-                url: '',
-                title: '',
-                thumbnail: '',
-                state: ItemState.DEFAULT
-            } as QueueItem
-        },
-        inQueue: (url: string, title: string, thumbnail?: string) => {
-            return {
-                url,
-                title,
-                thumbnail,
-                state: ItemState.IN_QUEUE
-            } as QueueItem
-        },
-        playing: (url: string, title: string, thumbnail?: string) => {
-            return {
-                url,
-                title,
-                thumbnail,
-                state: ItemState.PLAYING
-            } as QueueItem
-        }
-    }
-
-    private changeTracks(current: QueueItem | undefined, replacement: QueueItem | undefined) {
-        if (!replacement) {
-            replacement = this.initQueue.empty();
-        }
-        if (!current) {
-            current = this.initQueue.empty();
-        }
-        let a = [ItemState.PLAYING, ItemState.DEFAULT].includes(current.state) ? current : replacement;
-        let b = [current, replacement].find(x => x !== a) || {} as QueueItem;
-        a.state = ItemState.PLAYED;
-        b.state = ItemState.PLAYING;
-        this.currentTrack = b;
-        this.trackChanged.next(this.currentTrack);
+    private initQueueItem(url: string, title: string, thumbnail?: string): QueueItem {
+        return { url, title, thumbnail, state: ItemState.IN_QUEUE } as QueueItem
     }
 }
