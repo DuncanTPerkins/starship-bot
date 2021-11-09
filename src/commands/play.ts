@@ -32,7 +32,7 @@ export async function play(interaction: CommandInteraction) {
             await interaction.editReply({ embeds: [CommonEmbeds.error('finding a result for your search.')] })
             return;
         }
-        const item = await queue.addTrack(song.url, song.title, song.bestThumbnail.url || '');
+        const item = queue.addTrack(song.url, song.title, song.bestThumbnail.url || '');
         await trackQueued(interaction, item);
     }
     if (!streamer.isPlaying()) {
