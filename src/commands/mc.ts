@@ -1,17 +1,23 @@
 import { CommandInteraction, MessageEmbed, TextChannel } from "discord.js";
+import { CommonEmbeds } from "../common/common-embeds";
 import { getDb } from "../db/db";
 
 export async function mc(interaction: CommandInteraction) {
     const result = await registerMC(interaction.channelId);
     if (result instanceof Error) {
-        await interaction.reply(`\`❌ ${result.message}\``);
+        console.error(result);
+        interaction.reply({
+            embeds: [CommonEmbeds.error('registering the music channel. This channel is probably already registered.')],
+            ephemeral: true
+        });
+        return;
     } else {
         const { name } = interaction.guild?.channels.cache.get(interaction.channelId) as TextChannel;
-        await interaction.reply({
+        interaction.reply({
             embeds: [
                 new MessageEmbed()
-                    .setTitle('Success')
-                    .setDescription(`✔️ Registered current channel (name: ${name}, id: ${interaction.channelId}) as a music channel.`)
+                    .setTitle('Success registering music channel')
+                    .setFields([{ name: 'Channel Name', value: name }, { name: 'Channel Id', value: interaction.channelId }])
                     .setColor('#f73772')
             ], ephemeral: true
         });
@@ -59,9 +65,15 @@ export async function getMC(): Promise<any> {
 }
 
 export async function getWrongMcResponse(interaction: CommandInteraction) {
-    const { channel_id } = await getMC();
+    const { channel_id } = await getMC() || {};
+    if (!channel_id) {
+        interaction.reply(
+            { embeds: [CommonEmbeds.error('retrieving the music channel. Try registering one with /mc')], ephemeral: true }
+        );
+        return;
+    }
     const { name } = interaction.guild?.channels.cache.get(channel_id.toString()) as TextChannel;
-    await interaction.reply({
+    interaction.reply({
         embeds: [
             new MessageEmbed()
                 .setTitle('No...')

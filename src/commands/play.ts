@@ -1,4 +1,4 @@
-import { AudioPlayerStatus } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, VoiceChannel } from "discord.js";
 import { AudioStreamer } from "../audio-streamer/audio-streamer";
 import { CommonEmbeds } from "../common/common-embeds";
@@ -25,7 +25,6 @@ export async function play(interaction: CommandInteraction) {
             streamer.disconnect();
             return;
         }
-        await trackQueued(interaction, undefined, result)
     } else {
         const song = await streamer.getStreamableAsset(query || '');
         if (!song) {
@@ -33,12 +32,16 @@ export async function play(interaction: CommandInteraction) {
             return;
         }
         const item = queue.addTrack(song.url, song.title, song.bestThumbnail.url || '');
-        await trackQueued(interaction, item);
+        trackQueued(interaction, item);
     }
     if (!streamer.isPlaying()) {
         streamer.joinChannel(channel as VoiceChannel);
         let player = streamer.getAudioPlayer(queue?.currentTrack?.url || '');
-        if (player) {
+        if (player instanceof Error) {
+            interaction.reply({ embeds: [CommonEmbeds.error('getting this track.')] });
+            return;
+        }
+        if (player instanceof AudioPlayer) {
             const trackChanged = queue.trackChanged.subscribe((queueItem) => {
                 if (!queueItem || !queueItem.url || isPlaylist) {
                     return;
@@ -47,19 +50,14 @@ export async function play(interaction: CommandInteraction) {
                 if (!player) {
                     queue.clearQueue();
                     streamer.disconnect();
+                    return;
                 }
             });
             player.on(AudioPlayerStatus.Idle, () => {
-                const nextUp = queue.onTrackEnded();
-                if (!nextUp || !nextUp.url) {
-                    return;
-                }
-                player = streamer.getAudioPlayer(nextUp.url);
-                if (!player) {
-                    trackChanged.unsubscribe();
-                    queue.clearQueue();
-                    streamer.disconnect();
-                }
+                trackChanged.unsubscribe();
+                queue.clearQueue();
+                streamer.disconnect();
+                return;
             });
         }
     }
