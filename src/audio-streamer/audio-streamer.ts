@@ -27,7 +27,7 @@ export class AudioStreamer {
         });
     }
 
-    public getAudioPlayer(url: string | undefined): AudioPlayer | null {
+    public getAudioPlayer(url: string | undefined): AudioPlayer | Error | null {
         if (!url) {
             return null;
         }
@@ -36,6 +36,12 @@ export class AudioStreamer {
             this.disconnect();
             return null;
         }
+
+        stream.on('error', (err) => {
+            console.error(err);
+            return err;
+        });
+
         if (this.connection && !this.hasSubscription) {
             this.connection.subscribe(this.audioPlayer);
             this.hasSubscription = true;
@@ -49,7 +55,6 @@ export class AudioStreamer {
     }
 
     public async getStreamableAsset(query: string): Promise<Video | null> {
-        let filter;
         const ytsrQuery = await getFilters(query)
         const filters = ytsrQuery.get('Type')?.get('Video');
         if (filters && filters.url) {
@@ -66,11 +71,11 @@ export class AudioStreamer {
     }
 
     public disconnect() {
-        if (this.connection?.state.status === VoiceConnectionStatus.Destroyed) {
+        if (this.connection?.state.status === VoiceConnectionStatus.Disconnected) {
             return null;
         }
         this.hasSubscription = false;
         this.isPlaying() && this.audioPlayer.stop();
-        this.connection?.destroy();
+        this.connection?.disconnect();
     }
 }
