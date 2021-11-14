@@ -1,5 +1,6 @@
 import { AudioPlayer, AudioPlayerStatus } from "@discordjs/voice";
 import { CommandInteraction, GuildMember, VoiceChannel } from "discord.js";
+import { Subscription } from "rxjs";
 import { AudioStreamer } from "../audio-streamer/audio-streamer";
 import { CommonEmbeds } from "../common/common-embeds";
 import { IsYoutubePlaylist, YoutubePlaylistToQueueItems } from "../playlist-handlers/youtube-playlist-handler";
@@ -25,6 +26,7 @@ export async function play(interaction: CommandInteraction) {
             streamer.disconnect();
             return;
         }
+        trackQueued(interaction, undefined, result)
     } else {
         const song = await streamer.getStreamableAsset(query || '');
         if (!song) {
@@ -36,31 +38,33 @@ export async function play(interaction: CommandInteraction) {
     }
     if (!streamer.isPlaying()) {
         streamer.joinChannel(channel as VoiceChannel);
-        let player = streamer.getAudioPlayer(queue?.currentTrack?.url || '');
-        if (player instanceof Error) {
-            interaction.reply({ embeds: [CommonEmbeds.error('getting this track.')] });
-            return;
-        }
+        const player = getNextTrackAndPlay(queue?.currentTrack?.url || '', interaction);
         if (player instanceof AudioPlayer) {
             const trackChanged = queue.trackChanged.subscribe((queueItem) => {
                 if (!queueItem || !queueItem.url || isPlaylist) {
                     return;
                 }
-                player = streamer.getAudioPlayer(queueItem.url);
-                if (!player) {
-                    queue.clearQueue();
-                    streamer.disconnect();
-                    return;
-                }
+                getNextTrackAndPlay(queueItem.url, interaction);
             });
             player.on(AudioPlayerStatus.Idle, () => {
-                trackChanged.unsubscribe();
-                queue.clearQueue();
-                streamer.disconnect();
+                const nextUp = queue.onTrackEnded();
+                getNextTrackAndPlay(nextUp?.url || '', interaction, trackChanged);
                 return;
             });
         }
     }
+}
+
+export function getNextTrackAndPlay(url: string, interaction: CommandInteraction, trackChanged?: Subscription): AudioPlayer | Error | null {
+    const player = AudioStreamer.get().getAudioPlayer(url);
+    if (player instanceof Error) {
+        interaction.reply({ embeds: [CommonEmbeds.error('getting this track.')] });
+    } else if (!player || !url) {
+        SongQueue.get().clearQueue();
+        AudioStreamer.get().disconnect();
+        trackChanged?.unsubscribe();
+    }
+    return player;
 }
 
 export async function trackQueued(interaction: CommandInteraction, item: QueueItem | undefined = undefined, playlist?: any) {

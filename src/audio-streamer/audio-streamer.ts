@@ -36,17 +36,22 @@ export class AudioStreamer {
             this.disconnect();
             return null;
         }
-
-        stream.on('error', (err) => {
-            console.error(err);
-            return err;
-        });
-
         if (this.connection && !this.hasSubscription) {
             this.connection.subscribe(this.audioPlayer);
             this.hasSubscription = true;
         }
         this.audioPlayer.play(createAudioResource(stream));
+        // https://github.com/fent/node-ytdl-core/issues/932
+        const errHandler: any = stream.listeners('error')[2];
+        errHandler && stream.removeListener('error', errHandler);
+        stream.on('error', (err) => {
+            try {
+                throw new Error();
+            } catch {
+                stream.destroy();
+                console.log(err);
+            }
+        });
         return this.audioPlayer;
     }
 
